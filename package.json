@@ -1,0 +1,33 @@
+{
+  "name": "canopen-eds",
+  "version": "0.1.0",
+  "description": "Browser-compatible CANopen EDS (Electronic Data Sheet) parse and serialize",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test/",
+    "lint": "eslint ."
+  },
+  "keywords": [
+    "canopen"
+  ],
+  "author": "Wilkins White <ww@novadynamics.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DaxBot/node-canopen-eds.git"
+  },
+  "bugs": {
+    "url": "https://github.com/DaxBot/node-canopen-eds/issues"
+  },
+  "homepage": "https://daxbot.com/open-source",
+  "dependencies": {
+    "ini": "^3.0.1"
+  },
+  "devDependencies": {
+    "chai": "^4.3.10",
+    "eslint": "^8.57.1",
+    "eslint-plugin-mocha": "^9.0.0",
+    "eslint-plugin-node": "^11.1.0",
+    "mocha": "^10.3.0"
+  }
+}

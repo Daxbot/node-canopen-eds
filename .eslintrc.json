@@ -1,0 +1,67 @@
+{
+    "env": {
+        "commonjs": true,
+        "es2021": true,
+        "node": true
+    },
+    "extends": [
+        "eslint:recommended",
+        "plugin:mocha/recommended"
+    ],
+    "parserOptions": {
+        "ecmaVersion": 2022
+    },
+    "rules": {
+        "indent": [
+            "warn",
+            4,
+            {
+                "SwitchCase": 1,
+                "MemberExpression": "off"
+            }
+        ],
+        "brace-style": [
+            "warn",
+            "1tbs"
+        ],
+        "curly": [
+            "error",
+            "all"
+        ],
+        "max-len": [
+            "warn",
+            {
+                "code": 120,
+                "tabWidth": 4,
+                "comments": 120,
+                "ignoreUrls": true,
+                "ignoreStrings": true,
+                "ignoreRegExpLiterals": true
+            }
+        ],
+        "quotes": "off",
+        "camelcase": [
+            "error",
+            {
+                "properties": "never"
+            }
+        ],
+        "eqeqeq": "error",
+        "no-trailing-spaces": "warn",
+        "no-control-regex": "off",
+        "no-unused-vars": "error",
+        "no-var": "error",
+        "no-console": "error",
+        "keyword-spacing": [
+            "error",
+            {
+                "before": true,
+                "after": true
+            }
+        ],
+        "space-before-blocks": "error"
+    },
+    "plugins": [
+        "mocha"
+    ]
+}
