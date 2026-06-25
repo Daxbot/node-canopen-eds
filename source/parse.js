@@ -18,7 +18,10 @@ const { ObjectType, AccessType } = require('./types');
  * @private
  */
 function _parseEdsIni(text) {
-    const raw = parseIni(text);
+    // CANopenNode encodes the storage group as a non-standard ";StorageLocation="
+    // comment so CiA-306 tools ignore it. Un-comment it so the ini parser keeps it.
+    const prepared = text.replace(/^(\s*);(StorageLocation\s*=)/gim, '$1$2');
+    const raw = parseIni(prepared);
     const out = {};
     for (const [section, body] of Object.entries(raw)) {
         if (typeof body !== 'object') {
@@ -71,7 +74,7 @@ function _parseBool(s) {
  * @private
  */
 function _parseEntry(section) {
-    return {
+    const entry = {
         parameterName: section['parametername'] ?? '',
         objectType:    _parseNum(section['objecttype']) ?? ObjectType.VAR,
         dataType:      _parseNum(section['datatype']),
@@ -84,6 +87,17 @@ function _parseEntry(section) {
         objFlags:      _parseNum(section['objflags']),
         compactSubObj: _parseBool(section['compactsubobj']),
     };
+
+    // CANopenNode storage group (the ;StorageLocation comment, un-commented above).
+    // Keep the model convention used by XDD parse: omit the default 'RAM'.
+    const storage = section['storagelocation'];
+    if (storage !== undefined &&
+        String(storage).trim() !== '' &&
+        String(storage).trim().toUpperCase() !== 'RAM') {
+        entry.storageLocation = String(storage).trim();
+    }
+
+    return entry;
 }
 
 /**

@@ -63,12 +63,13 @@ function buildTestModel() {
                 pdoMapping:    false,
             },
             0x2000: {
-                parameterName: 'Read-only UINT32',
-                objectType:    ObjectType.VAR,
-                dataType:      DataType.UNSIGNED32,
-                accessType:    AccessType.READ_ONLY,
-                defaultValue:  '0xFF',
-                pdoMapping:    false,
+                parameterName:   'Read-only UINT32',
+                objectType:      ObjectType.VAR,
+                dataType:        DataType.UNSIGNED32,
+                accessType:      AccessType.READ_ONLY,
+                defaultValue:    '0xFF',
+                pdoMapping:      false,
+                storageLocation: 'FRAM', // ;StorageLocation comment
             },
             0x2001: {
                 parameterName: 'Read-write INT32',
@@ -87,8 +88,9 @@ function buildTestModel() {
                 pdoMapping:    false,
             },
             0x2010: {
-                parameterName: 'Test array',
-                objectType:    ObjectType.ARRAY,
+                parameterName:   'Test array',
+                objectType:      ObjectType.ARRAY,
+                storageLocation: 'PERSIST_COMM', // ;StorageLocation on a container
                 subObjects: {
                     0: { parameterName: 'Max sub-index', objectType: ObjectType.VAR, dataType: DataType.UNSIGNED8,  accessType: AccessType.READ_ONLY,  pdoMapping: false },
                     1: { parameterName: 'Element 1',    objectType: ObjectType.VAR, dataType: DataType.UNSIGNED16, accessType: AccessType.READ_WRITE, defaultValue: '100', pdoMapping: false },
@@ -244,6 +246,25 @@ describe('canopen-eds', function () {
         it('should preserve ARRAY sub defaultValues', function () {
             expect(reparsed.objects[0x2010].subObjects[1].defaultValue).to.equal('100');
             expect(reparsed.objects[0x2010].subObjects[2].defaultValue).to.equal('200');
+        });
+
+        it('should preserve storageLocation on a VAR (;StorageLocation)', function () {
+            expect(reparsed.objects[0x2000].storageLocation).to.equal('FRAM');
+        });
+
+        it('should preserve storageLocation on a container', function () {
+            expect(reparsed.objects[0x2010].storageLocation).to.equal('PERSIST_COMM');
+        });
+
+        it('should omit storageLocation for the default RAM group', function () {
+            // 0x2001 has no storageLocation set → should not appear after round-trip
+            expect(reparsed.objects[0x2001].storageLocation).to.equal(undefined);
+        });
+
+        it('should emit a ;StorageLocation comment line', function () {
+            const eds = serializeEds(buildTestModel());
+            expect(eds).to.include(';StorageLocation=FRAM');
+            expect(eds).to.include(';StorageLocation=PERSIST_COMM');
         });
     });
 });
