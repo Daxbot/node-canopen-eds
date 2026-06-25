@@ -168,10 +168,14 @@ function _writeObjectList(label, indices) {
  * @param entry
  * @private
  */
-function _writeEntrySection(hexKey, entry) {
+function _writeEntrySection(hexKey, entry, storageGroup) {
     const rows = [`[${hexKey}]`];
     rows.push(`ParameterName=${entry.parameterName}`);
     rows.push(`ObjectType=${_hex2(entry.objectType)}`);
+
+    // CANopenNode storage group, encoded as a non-standard comment (CiA-306 tools
+    // ignore it). Subs inherit the parent object's group.
+    rows.push(`;StorageLocation=${storageGroup || entry.storageLocation || 'RAM'}`);
 
     if (entry.subNumber !== undefined) {
         rows.push(`SubNumber=${_hex2(entry.subNumber)}`);
@@ -230,14 +234,15 @@ function _writeObjectSection(idx, entry) {
         const subObjects  = entry.subObjects || {};
         const subIndices  = Object.keys(subObjects).map(Number).sort((a, b) => a - b);
         const containerEntry = { ...entry, subNumber: subIndices.length };
-        parts.push(_writeEntrySection(hexKey, containerEntry));
+        const group = entry.storageLocation;
+        parts.push(_writeEntrySection(hexKey, containerEntry, group));
 
         for (const sub of subIndices) {
             const subHex = sub.toString(16).toUpperCase().padStart(2, '0');
-            parts.push(_writeEntrySection(`${hexKey}sub${subHex}`, subObjects[sub]));
+            parts.push(_writeEntrySection(`${hexKey}sub${subHex}`, subObjects[sub], group));
         }
     } else {
-        parts.push(_writeEntrySection(hexKey, entry));
+        parts.push(_writeEntrySection(hexKey, entry, entry.storageLocation));
     }
 
     return parts.join(EOL + EOL);
