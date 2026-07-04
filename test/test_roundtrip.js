@@ -192,7 +192,7 @@ describe('canopen-eds', function () {
         });
 
         it('should include sub-object sections', function () {
-            expect(serializeEds(buildTestModel())).to.include('[2010sub01]');
+            expect(serializeEds(buildTestModel())).to.include('[2010sub1]');
         });
 
         it('should write CRLF line endings', function () {

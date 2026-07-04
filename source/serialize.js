@@ -14,18 +14,11 @@ const EOL = '\r\n';
 
 /**
  * @param n
+ * @param {number} [pad=0]
  * @private
  */
-function _hex4(n) {
-    return `0x${n.toString(16).toUpperCase().padStart(4, '0')}`;
-}
-
-/**
- * @param n
- * @private
- */
-function _hex2(n) {
-    return `0x${n.toString(16).toUpperCase().padStart(2, '0')}`;
+function _hexPad(n, pad = 0) {
+    return `0x${n.toString(16).toUpperCase().padStart(pad, '0')}`;
 }
 
 /**
@@ -159,7 +152,7 @@ function _writeComments(comments) {
  */
 function _writeObjectList(label, indices) {
     const rows = [`[${label}]`, `SupportedObjects=${indices.length}`];
-    indices.forEach((idx, i) => rows.push(`${i + 1}=${_hex4(idx)}`));
+    indices.forEach((idx, i) => rows.push(`${i + 1}=${_hexPad(idx, 4)}`));
     return rows.join(EOL);
 }
 
@@ -171,18 +164,18 @@ function _writeObjectList(label, indices) {
 function _writeEntrySection(hexKey, entry, storageGroup) {
     const rows = [`[${hexKey}]`];
     rows.push(`ParameterName=${entry.parameterName}`);
-    rows.push(`ObjectType=${_hex2(entry.objectType)}`);
+    rows.push(`ObjectType=${_hexPad(entry.objectType)}`);
 
     // CANopenNode storage group, encoded as a non-standard comment (CiA-306 tools
     // ignore it). Subs inherit the parent object's group.
     rows.push(`;StorageLocation=${storageGroup || entry.storageLocation || 'RAM'}`);
 
     if (entry.subNumber !== undefined) {
-        rows.push(`SubNumber=${_hex2(entry.subNumber)}`);
+        rows.push(`SubNumber=${_hexPad(entry.subNumber)}`);
     }
 
     if (entry.dataType !== undefined) {
-        rows.push(`DataType=${_hex2(entry.dataType)}`);
+        rows.push(`DataType=${_hexPad(entry.dataType, 4)}`);
     }
 
     if (entry.accessType !== undefined) {
@@ -238,8 +231,7 @@ function _writeObjectSection(idx, entry) {
         parts.push(_writeEntrySection(hexKey, containerEntry, group));
 
         for (const sub of subIndices) {
-            const subHex = sub.toString(16).toUpperCase().padStart(2, '0');
-            parts.push(_writeEntrySection(`${hexKey}sub${subHex}`, subObjects[sub], group));
+            parts.push(_writeEntrySection(`${hexKey}sub${sub.toString(16).toUpperCase()}`, subObjects[sub], group));
         }
     } else {
         parts.push(_writeEntrySection(hexKey, entry, entry.storageLocation));
