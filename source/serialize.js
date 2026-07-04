@@ -256,9 +256,10 @@ function serializeEds(model) {
         .map(Number)
         .sort((a, b) => a - b);
 
-    const mandatory    = sortedIndices.filter(i => i >= 0x1000 && i <= 0x1029);
+    const MANDATORY_INDICES = new Set([0x1000, 0x1001, 0x1018]);
+    const mandatory    = sortedIndices.filter(i => MANDATORY_INDICES.has(i));
     const optional     = sortedIndices.filter(
-        i => (i >= 0x102A && i <= 0x1FFF) || (i >= 0x6000 && i <= 0x9FFF)
+        i => !MANDATORY_INDICES.has(i) && ((i >= 0x1002 && i <= 0x1FFF) || (i >= 0x6000 && i <= 0x9FFF))
     );
     const manufacturer = sortedIndices.filter(i => i >= 0x2000 && i <= 0x5FFF);
 
