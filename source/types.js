@@ -63,6 +63,12 @@ const AccessType = {
      * Read only access. Contents should not change after initialization.
      */
     CONSTANT: 'const',
+
+    /** Read and write access for output objects (process data written to device). */
+    READ_WRITE_OUTPUT: 'rww',
+
+    /** Read and write access for input objects (process data read from device). */
+    READ_WRITE_INPUT: 'rwr',
 };
 
 /**
