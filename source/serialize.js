@@ -80,6 +80,7 @@ function _writeFileInfo(fileInfo) {
         `FileVersion=${fileInfo.fileVersion   || '1'}`,
         `FileRevision=${fileInfo.fileRevision || '1'}`,
         `EDSVersion=${fileInfo.edsVersion     || '4.0'}`,
+        `LastEDS=`,
         `Description=${fileInfo.description   || ''}`,
         `CreationTime=${fileInfo.creationTime || _formatTime(now)}`,
         `CreationDate=${fileInfo.creationDate || _formatDate(now)}`,
@@ -115,6 +116,7 @@ function _writeDeviceInfo(deviceInfo) {
         `SimpleBootUpSlave=${_boolNum(deviceInfo.simpleBootUpSlave)}`,
         `Granularity=${deviceInfo.granularity                         ?? 0}`,
         `DynamicChannelsSupported=${deviceInfo.dynamicChannelsSupported ?? 0}`,
+        `CompactPDO=0`,
         `GroupMessaging=${_boolNum(deviceInfo.groupMessaging)}`,
         `NrOfRXPDO=${deviceInfo.nrOfRXPDO                            ?? 0}`,
         `NrOfTXPDO=${deviceInfo.nrOfTXPDO                            ?? 0}`,
@@ -182,8 +184,8 @@ function _writeEntrySection(hexKey, entry, storageGroup) {
         rows.push(`AccessType=${entry.accessType}`);
     }
 
-    if (entry.defaultValue !== undefined && entry.defaultValue !== '') {
-        rows.push(`DefaultValue=${entry.defaultValue}`);
+    if (entry.dataType !== undefined) {
+        rows.push(`DefaultValue=${entry.defaultValue ?? ''}`);
     }
 
     if (entry.lowLimit !== undefined && entry.lowLimit !== '') {
