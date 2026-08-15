@@ -182,7 +182,10 @@ function _parseDummyUsage(sections) {
     const s = sections['dummyusage'] ?? {};
     const out = {};
     for (const [k, v] of Object.entries(s)) {
-        out[k] = _parseBool(v);
+        // The ini parse lowercases keys; normalize to the canonical
+        // 'DummyNNNN' form so consumers can rely on the casing.
+        const match = k.match(/^dummy([0-9]{4})$/i);
+        out[match ? `Dummy${match[1]}` : k] = _parseBool(v);
     }
     return out;
 }
