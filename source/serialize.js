@@ -85,8 +85,8 @@ function _writeFileInfo(fileInfo) {
         `CreationTime=${fileInfo.creationTime || _formatTime(now)}`,
         `CreationDate=${fileInfo.creationDate || _formatDate(now)}`,
         `CreatedBy=${fileInfo.createdBy        || ''}`,
-        `ModificationTime=${_formatTime(now)}`,
-        `ModificationDate=${_formatDate(now)}`,
+        `ModificationTime=${fileInfo.modificationTime || _formatTime(now)}`,
+        `ModificationDate=${fileInfo.modificationDate || _formatDate(now)}`,
         `ModifiedBy=${fileInfo.modifiedBy      || ''}`,
     );
 }
