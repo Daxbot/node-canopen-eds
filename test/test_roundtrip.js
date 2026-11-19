@@ -1,7 +1,7 @@
 'use strict';
 
 const chai   = require('chai');
-const { parseEds, serializeEds, ObjectType, AccessType, DataType } = require('..');
+const { parseEds, serializeEds, createEmptyEds, ObjectType, AccessType, DataType } = require('..');
 const expect = chai.expect;
 
 /** Build a representative EdsModel covering all relevant object types. */
@@ -266,5 +266,26 @@ describe('canopen-eds', function () {
             expect(eds).to.include(';StorageLocation=FRAM');
             expect(eds).to.include(';StorageLocation=PERSIST_COMM');
         });
+    });
+});
+
+describe('StringLengthMin', function () {
+    it('keeps the CANopenNode minimum string length', function () {
+        const model = createEmptyEds('Test');
+        model.objects[0x1009] = {
+            parameterName: 'Manufacturer hardware version',
+            objectType: ObjectType.VAR,
+            dataType: DataType.VISIBLE_STRING,
+            accessType: AccessType.CONSTANT,
+            defaultValue: '1.0',
+            pdoMapping: false,
+            stringLength: 16,
+        };
+        const text = serializeEds(model);
+        expect(text).to.contain(';StringLengthMin=16');
+        expect(parseEds(text).objects[0x1009].stringLength).to.equal(16);
+
+        delete model.objects[0x1009].stringLength;
+        expect(serializeEds(model)).to.not.contain('StringLengthMin');
     });
 });

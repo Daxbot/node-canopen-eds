@@ -6,7 +6,21 @@
 
 const { parseEds }    = require('./source/parse');
 const { serializeEds } = require('./source/serialize');
-const { ObjectType, AccessType, DataType } = require('./source/types');
+const {
+    ObjectType,
+    AccessType,
+    DataType,
+    ObjectTypeName,
+    DataTypeName,
+    dataTypeSize,
+    isIntegerType,
+    isSignedType,
+    isUnsignedType,
+    isFloatType,
+    isStringType,
+    isContainerType,
+} = require('./source/types');
+const { validateEds } = require('./source/validate');
 const { EdsError, Eds } = require('./source/eds');
 const {
     createEmptyEds,
@@ -36,6 +50,16 @@ module.exports = {
     ObjectType,
     AccessType,
     DataType,
+    ObjectTypeName,
+    DataTypeName,
+    dataTypeSize,
+    isIntegerType,
+    isSignedType,
+    isUnsignedType,
+    isFloatType,
+    isStringType,
+    isContainerType,
+    validateEds,
     EdsError,
     Eds,
     createEmptyEds,

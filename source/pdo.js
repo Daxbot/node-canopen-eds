@@ -4,7 +4,7 @@
  * @copyright 2026 Daxbot
  */
 
-const { ObjectType, DataType, AccessType } = require('./types');
+const { ObjectType, DataType, AccessType, dataTypeSize } = require('./types');
 
 /**
  * Parse a 32-bit PDO mapping value into its components.
@@ -52,7 +52,7 @@ function getPdoMappableObjects(objects) {
         const idx = Number(idxStr);
 
         if (entry.objectType === ObjectType.VAR && entry.pdoMapping) {
-            const bits = (_dataTypeSize(entry.dataType) || 1) * 8;
+            const bits = (dataTypeSize(entry.dataType) || 1) * 8;
             result.push({ index: idx, subIndex: 0, name: entry.parameterName, dataType: entry.dataType, bits });
         }
 
@@ -64,7 +64,7 @@ function getPdoMappableObjects(objects) {
                 }
 
                 if (sub.pdoMapping) {
-                    const bits = (_dataTypeSize(sub.dataType) || 1) * 8;
+                    const bits = (dataTypeSize(sub.dataType) || 1) * 8;
                     result.push({
                         index: idx, subIndex: subIdx, name: sub.parameterName, dataType: sub.dataType, bits
                     });
@@ -400,25 +400,6 @@ function _setVar(subs, oldSubs, subIdx, name, dt, ac, value) {
     } else {
         subs[subIdx] = { ...old, defaultValue: String(value) };
     }
-}
-
-/**
- *
- * @param type
- */
-function _dataTypeSize(type) {
-    const sizes = {
-        [DataType.BOOLEAN]: 1,
-        [DataType.INTEGER8]: 1, [DataType.UNSIGNED8]: 1,
-        [DataType.INTEGER16]: 2, [DataType.UNSIGNED16]: 2,
-        [DataType.INTEGER24]: 3, [DataType.UNSIGNED24]: 3,
-        [DataType.INTEGER32]: 4, [DataType.UNSIGNED32]: 4, [DataType.REAL32]: 4,
-        [DataType.INTEGER40]: 5, [DataType.UNSIGNED40]: 5,
-        [DataType.INTEGER48]: 6, [DataType.UNSIGNED48]: 6, [DataType.TIME_OF_DAY]: 6, [DataType.TIME_DIFFERENCE]: 6,
-        [DataType.INTEGER56]: 7, [DataType.UNSIGNED56]: 7,
-        [DataType.INTEGER64]: 8, [DataType.UNSIGNED64]: 8, [DataType.REAL64]: 8,
-    };
-    return sizes[type] ?? null;
 }
 
 module.exports = {

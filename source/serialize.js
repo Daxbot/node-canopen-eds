@@ -163,14 +163,15 @@ function _writeObjectList(label, indices) {
  * @param entry
  * @private
  */
-function _writeEntrySection(hexKey, entry, storageGroup) {
+function _writeEntrySection(hexKey, entry) {
     const rows = [`[${hexKey}]`];
     rows.push(`ParameterName=${entry.parameterName}`);
     rows.push(`ObjectType=${_hexPad(entry.objectType)}`);
 
     // CANopenNode storage group, encoded as a non-standard comment (CiA-306 tools
-    // ignore it). Subs inherit the parent object's group.
-    rows.push(`;StorageLocation=${storageGroup || entry.storageLocation || 'RAM'}`);
+    // ignore it). CANopenNode uses only the group of the object, and writes RAM
+    // on each sub-object, so a sub-object writes its own group (default RAM).
+    rows.push(`;StorageLocation=${entry.storageLocation || 'RAM'}`);
 
     if (entry.subNumber !== undefined) {
         rows.push(`SubNumber=${_hexPad(entry.subNumber)}`);
@@ -186,6 +187,12 @@ function _writeEntrySection(hexKey, entry, storageGroup) {
 
     if (entry.dataType !== undefined) {
         rows.push(`DefaultValue=${entry.defaultValue ?? ''}`);
+    }
+
+    // CANopenNode minimum string length, encoded as a non-standard comment
+    // like ;StorageLocation (CO_stringLengthMin in XDD).
+    if (entry.stringLength !== undefined && entry.stringLength !== null && entry.stringLength !== '') {
+        rows.push(`;StringLengthMin=${entry.stringLength}`);
     }
 
     if (entry.lowLimit !== undefined && entry.lowLimit !== '') {
@@ -229,14 +236,13 @@ function _writeObjectSection(idx, entry) {
         const subObjects  = entry.subObjects || {};
         const subIndices  = Object.keys(subObjects).map(Number).sort((a, b) => a - b);
         const containerEntry = { ...entry, subNumber: subIndices.length };
-        const group = entry.storageLocation;
-        parts.push(_writeEntrySection(hexKey, containerEntry, group));
+        parts.push(_writeEntrySection(hexKey, containerEntry));
 
         for (const sub of subIndices) {
-            parts.push(_writeEntrySection(`${hexKey}sub${sub.toString(16).toUpperCase()}`, subObjects[sub], group));
+            parts.push(_writeEntrySection(`${hexKey}sub${sub.toString(16).toUpperCase()}`, subObjects[sub]));
         }
     } else {
-        parts.push(_writeEntrySection(hexKey, entry, entry.storageLocation));
+        parts.push(_writeEntrySection(hexKey, entry));
     }
 
     return parts.join(EOL + EOL);

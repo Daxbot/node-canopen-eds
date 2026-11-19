@@ -18,9 +18,10 @@ const { ObjectType, AccessType } = require('./types');
  * @private
  */
 function _parseEdsIni(text) {
-    // CANopenNode encodes the storage group as a non-standard ";StorageLocation="
-    // comment so CiA-306 tools ignore it. Un-comment it so the ini parser keeps it.
-    const prepared = text.replace(/^(\s*);(StorageLocation\s*=)/gim, '$1$2');
+    // CANopenNode encodes the storage group and the minimum string length as
+    // non-standard ";StorageLocation=" and ";StringLengthMin=" comments so
+    // CiA-306 tools ignore them. Un-comment them so the ini parser keeps them.
+    const prepared = text.replace(/^(\s*);((?:StorageLocation|StringLengthMin)\s*=)/gim, '$1$2');
     const raw = parseIni(prepared);
     const out = {};
     for (const [section, body] of Object.entries(raw)) {
@@ -95,6 +96,13 @@ function _parseEntry(section) {
         String(storage).trim() !== '' &&
         String(storage).trim().toUpperCase() !== 'RAM') {
         entry.storageLocation = String(storage).trim();
+    }
+
+    // CANopenNode minimum string length (CO_stringLengthMin in XDD), from the
+    // ;StringLengthMin comment, un-commented above.
+    const stringLength = _parseNum(section['stringlengthmin']);
+    if (stringLength !== undefined && !isNaN(stringLength)) {
+        entry.stringLength = stringLength;
     }
 
     return entry;

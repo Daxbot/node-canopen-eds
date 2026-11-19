@@ -170,4 +170,140 @@ const DataType = {
     IDENTITY: 35,
 };
 
-module.exports = exports = { ObjectType, AccessType, DataType };
+/**
+ * Object type names by value, e.g. ObjectTypeName[7] is 'VAR'.
+ * @type {Object<number, string>}
+ */
+const ObjectTypeName = Object.fromEntries(
+    Object.entries(ObjectType).map(([k, v]) => [v, k])
+);
+
+/**
+ * Data type names by value, e.g. DataTypeName[6] is 'UNSIGNED16'.
+ * @type {Object<number, string>}
+ */
+const DataTypeName = Object.fromEntries(
+    Object.entries(DataType).map(([k, v]) => [v, k])
+);
+
+const DATA_TYPE_SIZE = {
+    [DataType.BOOLEAN]: 1,
+    [DataType.INTEGER8]: 1,
+    [DataType.UNSIGNED8]: 1,
+    [DataType.INTEGER16]: 2,
+    [DataType.UNSIGNED16]: 2,
+    [DataType.INTEGER24]: 3,
+    [DataType.UNSIGNED24]: 3,
+    [DataType.INTEGER32]: 4,
+    [DataType.UNSIGNED32]: 4,
+    [DataType.REAL32]: 4,
+    [DataType.INTEGER40]: 5,
+    [DataType.UNSIGNED40]: 5,
+    [DataType.INTEGER48]: 6,
+    [DataType.UNSIGNED48]: 6,
+    [DataType.INTEGER56]: 7,
+    [DataType.UNSIGNED56]: 7,
+    [DataType.INTEGER64]: 8,
+    [DataType.UNSIGNED64]: 8,
+    [DataType.REAL64]: 8,
+    [DataType.TIME_OF_DAY]: 6,
+    [DataType.TIME_DIFFERENCE]: 6,
+};
+
+const SIGNED_TYPES = [
+    DataType.INTEGER8, DataType.INTEGER16, DataType.INTEGER24,
+    DataType.INTEGER32, DataType.INTEGER40, DataType.INTEGER48,
+    DataType.INTEGER56, DataType.INTEGER64,
+];
+
+const UNSIGNED_TYPES = [
+    DataType.UNSIGNED8, DataType.UNSIGNED16, DataType.UNSIGNED24,
+    DataType.UNSIGNED32, DataType.UNSIGNED40, DataType.UNSIGNED48,
+    DataType.UNSIGNED56, DataType.UNSIGNED64,
+];
+
+/**
+ * Return the size of a data type in bytes.
+ * @param {number} type - DataType value.
+ * @returns {number|null} null for a type of variable length.
+ */
+function dataTypeSize(type) {
+    return DATA_TYPE_SIZE[type] ?? null;
+}
+
+/**
+ * Return true for BOOLEAN and the integer types.
+ * @param {number} type - DataType value.
+ * @returns {boolean}
+ */
+function isIntegerType(type) {
+    return type === DataType.BOOLEAN || isSignedType(type) || isUnsignedType(type);
+}
+
+/**
+ * Return true for the signed integer types.
+ * @param {number} type - DataType value.
+ * @returns {boolean}
+ */
+function isSignedType(type) {
+    return SIGNED_TYPES.includes(type);
+}
+
+/**
+ * Return true for the unsigned integer types.
+ * @param {number} type - DataType value.
+ * @returns {boolean}
+ */
+function isUnsignedType(type) {
+    return UNSIGNED_TYPES.includes(type);
+}
+
+/**
+ * Return true for the floating point types.
+ * @param {number} type - DataType value.
+ * @returns {boolean}
+ */
+function isFloatType(type) {
+    return type === DataType.REAL32 || type === DataType.REAL64;
+}
+
+/**
+ * Return true for the string types.
+ * @param {number} type - DataType value.
+ * @returns {boolean}
+ */
+function isStringType(type) {
+    return [
+        DataType.VISIBLE_STRING,
+        DataType.OCTET_STRING,
+        DataType.UNICODE_STRING,
+    ].includes(type);
+}
+
+/**
+ * Return true for the object types that hold sub-objects.
+ * @param {number} objectType - ObjectType value.
+ * @returns {boolean}
+ */
+function isContainerType(objectType) {
+    return [
+        ObjectType.ARRAY,
+        ObjectType.RECORD,
+        ObjectType.DEFSTRUCT,
+    ].includes(objectType);
+}
+
+module.exports = exports = {
+    ObjectType,
+    AccessType,
+    DataType,
+    ObjectTypeName,
+    DataTypeName,
+    dataTypeSize,
+    isIntegerType,
+    isSignedType,
+    isUnsignedType,
+    isFloatType,
+    isStringType,
+    isContainerType,
+};
